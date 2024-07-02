@@ -34,7 +34,7 @@ public class Rooms implements Serializable {
     /**
      * 
      */
-    private Integer max_capacity;
+    private Integer maxCapacity;
 
     /**
      * 0:未启用，1：已启用,2:已占用
