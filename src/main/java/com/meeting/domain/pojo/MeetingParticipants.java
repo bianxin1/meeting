@@ -1,4 +1,4 @@
-package com.meeting.domain;
+package com.meeting.domain.pojo;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;

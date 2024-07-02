@@ -1,4 +1,4 @@
-package com.meeting.domain;
+package com.meeting.domain.pojo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -11,11 +11,11 @@ import java.util.Date;
 
 /**
  * 
- * @TableName notifications
+ * @TableName meetings
  */
-@TableName(value ="notifications")
+@TableName(value ="meetings")
 @Data
-public class Notifications implements Serializable {
+public class Meetings implements Serializable {
     /**
      * 
      */
@@ -25,27 +25,32 @@ public class Notifications implements Serializable {
     /**
      * 
      */
-    private Integer user_id;
+    private String name;
 
     /**
      * 
      */
-    private Integer meeting_id;
+    private Integer participant_count;
 
     /**
      * 
      */
-    private String message;
+    private Integer room_id;
 
     /**
      * 
      */
-    private Integer is_read;
+    private Date start_time;
 
     /**
      * 
      */
-    private Date timestamp;
+    private Date end_time;
+
+    /**
+     * 
+     */
+    private String description;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;

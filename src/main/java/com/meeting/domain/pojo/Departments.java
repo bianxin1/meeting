@@ -1,4 +1,4 @@
-package com.meeting.domain;
+package com.meeting.domain.pojo;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -7,15 +7,14 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 import java.io.Serializable;
-import java.util.Date;
 
 /**
  * 
- * @TableName meetings
+ * @TableName 部门
  */
-@TableName(value ="meetings")
+@TableName(value ="departments")
 @Data
-public class Meetings implements Serializable {
+public class Departments implements Serializable {
     /**
      * 
      */
@@ -26,31 +25,6 @@ public class Meetings implements Serializable {
      * 
      */
     private String name;
-
-    /**
-     * 
-     */
-    private Integer participant_count;
-
-    /**
-     * 
-     */
-    private Integer room_id;
-
-    /**
-     * 
-     */
-    private Date start_time;
-
-    /**
-     * 
-     */
-    private Date end_time;
-
-    /**
-     * 
-     */
-    private String description;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;

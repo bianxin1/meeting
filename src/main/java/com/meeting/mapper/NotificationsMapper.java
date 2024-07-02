@@ -2,7 +2,7 @@ package com.meeting.mapper;
 
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.meeting.domain.Notifications;
+import com.meeting.domain.pojo.Notifications;
 
 /**
 * @author shanmingxi

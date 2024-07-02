@@ -2,7 +2,7 @@ package com.meeting.service.impl;
 
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.meeting.domain.Notifications;
+import com.meeting.domain.pojo.Notifications;
 import com.meeting.mapper.NotificationsMapper;
 import com.meeting.service.NotificationsService;
 import org.springframework.stereotype.Service;
