@@ -8,17 +8,22 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.meeting.commen.result.Result;
 import com.meeting.config.JwtProperties;
 import com.meeting.domain.dtos.LoginDto;
+import com.meeting.domain.dtos.PasswordDto;
 import com.meeting.domain.dtos.RegisterDto;
+import com.meeting.domain.dtos.UpdateInfoDto;
 import com.meeting.domain.pojos.Users;
 import com.meeting.domain.vos.LoginVo;
 import com.meeting.mapper.UsersMapper;
 import com.meeting.service.UsersService;
+import com.meeting.utils.EmailTool;
 import com.meeting.utils.JwtTool;
+import com.meeting.utils.UserContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 import static com.meeting.commen.constants.RedisKey.USER_CODE_KEY;
@@ -36,6 +41,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
     private final JwtTool jwtTool;
     private final JwtProperties jwtProperties;
     private final UsersMapper usersMapper;
+    private final EmailTool emailTool;
 
 
     @Override
@@ -95,13 +101,57 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
         if (code != null) {
             return Result.fail("验证码已发送，请稍后再试");
         }
-        // 2. 生成验证码
+        // 2. 判断邮箱账号是否被注册
+        QueryWrapper<Users> queryWrapper = Wrappers.query();
+        queryWrapper.eq("email", registerDto.getEmail());
+        Users user = usersMapper.selectOne(queryWrapper);
+        if (user != null) {
+            return Result.fail("邮箱已被注册");
+        }
+        // 3. 生成验证码
         String createCode = RandomUtil.randomNumbers(6);
-        // 3. 保存验证码
+        // 4. 保存验证码
         stringRedisTemplate.opsForValue().set(USER_CODE_KEY + registerDto.getEmail(), createCode, 5, TimeUnit.MINUTES);
-        // TODO 4. 通过邮件发送验证码
-        // 5. 返回
+        // 5. 发送邮件
+        String content = "您的验证码是：" + createCode + "，请在5分钟内输入";
+        String title = "会议室预约系统";
+        emailTool.sendEmail(registerDto.getEmail(), content, title);
+        // 6. 返回
         return Result.succ("验证码发送成功");
+    }
+
+    /**
+     * 修改密码
+     * @param passwordDto
+     * @return
+     */
+    @Override
+    public Result updatePassword(PasswordDto passwordDto) {
+        // 1. 校验密码
+        Long userId = UserContext.getUser();
+        Users user = usersMapper.selectById(userId);
+        if (!user.getPassword().equals(passwordDto.getOldPassword())) {
+            return Result.fail("原密码错误");
+        }
+        // 2. 修改密码
+        user.setPassword(passwordDto.getNewPassword());
+        usersMapper.updateById(user);
+        return Result.succ("修改成功");
+    }
+
+    /**
+     * 修改个人信息
+     * @param updateInfoDto
+     * @return
+     */
+    @Override
+    public Result updateInfo(UpdateInfoDto updateInfoDto) {
+        // 1. 修改信息
+        Long userId = UserContext.getUser();
+        Users user = usersMapper.selectById(userId);
+        BeanUtils.copyProperties(updateInfoDto, user);
+        usersMapper.updateById(user);
+        return Result.succ("修改成功");
     }
 }
 

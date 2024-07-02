@@ -19,7 +19,7 @@ public class Users implements Serializable {
      * 
      */
     @TableId(type = IdType.AUTO)
-    private Integer id;
+    private Long id;
 
     /**
      * 
@@ -59,12 +59,12 @@ public class Users implements Serializable {
     /**
      * 
      */
-    private Integer is_deleted;
+    private Integer isDeleted;
 
     /**
      * 
      */
-    private Integer department_id;
+    private Integer departmentId;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
