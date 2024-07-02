@@ -2,7 +2,7 @@ package com.meeting.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.meeting.domain.pojo.Notifications;
+import com.meeting.domain.pojos.Notifications;
 
 /**
 * @author shanmingxi

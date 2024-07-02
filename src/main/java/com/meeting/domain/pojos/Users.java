@@ -1,4 +1,4 @@
-package com.meeting.domain.pojo;
+package com.meeting.domain.pojos;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
