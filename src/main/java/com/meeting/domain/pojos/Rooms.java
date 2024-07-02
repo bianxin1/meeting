@@ -1,4 +1,4 @@
-package com.meeting.domain;
+package com.meeting.domain.pojos;
 
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
@@ -10,11 +10,11 @@ import java.io.Serializable;
 
 /**
  * 
- * @TableName users
+ * @TableName rooms
  */
-@TableName(value ="users")
+@TableName(value ="rooms")
 @Data
-public class Users implements Serializable {
+public class Rooms implements Serializable {
     /**
      * 
      */
@@ -29,42 +29,22 @@ public class Users implements Serializable {
     /**
      * 
      */
-    private String account;
+    private String location;
 
     /**
      * 
      */
-    private Integer gender;
+    private Integer max_capacity;
+
+    /**
+     * 0:未启用，1：已启用,2:已占用
+     */
+    private Integer status;
 
     /**
      * 
      */
-    private String password;
-
-    /**
-     * 0:普通用户，1：管理员
-     */
-    private Integer role;
-
-    /**
-     * 
-     */
-    private String telephone;
-
-    /**
-     * 
-     */
-    private String email;
-
-    /**
-     * 
-     */
-    private Integer is_deleted;
-
-    /**
-     * 
-     */
-    private Integer department_id;
+    private String remarks;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;

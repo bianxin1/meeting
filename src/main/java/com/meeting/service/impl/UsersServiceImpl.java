@@ -2,7 +2,7 @@ package com.meeting.service.impl;
 
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.meeting.domain.Users;
+import com.meeting.domain.pojos.Users;
 import com.meeting.mapper.UsersMapper;
 import com.meeting.service.UsersService;
 import org.springframework.stereotype.Service;

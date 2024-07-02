@@ -1,7 +1,7 @@
 package com.meeting.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.meeting.domain.Departments;
+import com.meeting.domain.pojos.Departments;
 import com.meeting.service.DepartmentsService;
 import com.meeting.mapper.DepartmentsMapper;
 import org.springframework.stereotype.Service;

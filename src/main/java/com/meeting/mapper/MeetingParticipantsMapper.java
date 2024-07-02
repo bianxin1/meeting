@@ -2,7 +2,7 @@ package com.meeting.mapper;
 
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.meeting.domain.MeetingParticipants;
+import com.meeting.domain.pojos.MeetingParticipants;
 
 /**
 * @author shanmingxi

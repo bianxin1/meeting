@@ -1,7 +1,7 @@
 package com.meeting.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.meeting.domain.Users;
+import com.meeting.domain.pojos.Users;
 
 /**
 * @author shanmingxi
