@@ -1,6 +1,9 @@
 package com.meeting.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.meeting.commen.result.Result;
+import com.meeting.domain.dtos.LoginDto;
+import com.meeting.domain.dtos.RegisterDto;
 import com.meeting.domain.pojos.Users;
 
 /**
@@ -9,5 +12,23 @@ import com.meeting.domain.pojos.Users;
 * @createDate 2024-07-01 17:56:56
 */
 public interface UsersService extends IService<Users> {
+    /**
+     * 注册
+     * @param registerDto
+     */
+    Result register(RegisterDto registerDto);
 
+    /**
+     * 登录
+     * @param loginDto
+     * @return
+     */
+    Result login(LoginDto loginDto);
+
+    /**
+     * 发送验证码
+     * @param registerDto
+     * @return
+     */
+    Result sendCode(RegisterDto registerDto);
 }
