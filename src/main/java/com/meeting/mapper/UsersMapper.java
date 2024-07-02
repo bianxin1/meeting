@@ -3,6 +3,8 @@ package com.meeting.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.meeting.domain.pojos.Users;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 /**
 * @author shanmingxi
@@ -11,7 +13,8 @@ import com.meeting.domain.pojos.Users;
 * @Entity generator.domain.Users
 */
 public interface UsersMapper extends BaseMapper<Users> {
-
+    @Select("select * from users where email = #{email} or account = #{account}")
+    Users selectByAccountOrEmail(@Param("email") String email,@Param("account") String account);
 }
 
 
