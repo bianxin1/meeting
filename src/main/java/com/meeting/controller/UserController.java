@@ -2,16 +2,15 @@ package com.meeting.controller;
 
 import com.meeting.commen.result.Result;
 import com.meeting.domain.dtos.LoginDto;
+import com.meeting.domain.dtos.PasswordDto;
 import com.meeting.domain.dtos.RegisterDto;
+import com.meeting.domain.dtos.UpdateInfoDto;
 import com.meeting.service.UsersService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Api(tags = "用户管理")
 @RestController
@@ -38,6 +37,18 @@ public class UserController {
     public Result sendCode(@RequestBody RegisterDto registerDto) {
         // 发送验证码
         return userService.sendCode(registerDto);
+    }
+    @ApiOperation("修改密码")
+    @PutMapping("/updatePassword")
+    public Result updatePassword(@RequestBody PasswordDto passwordDto) {
+        // 修改密码
+        return userService.updatePassword(passwordDto);
+    }
+    @ApiOperation("修改个人信息")
+    @PutMapping("/updateInfo")
+    public Result updateInfo(@RequestBody UpdateInfoDto updateInfoDto) {
+        // 修改个人信息
+        return userService.updateInfo(updateInfoDto);
     }
 
 }

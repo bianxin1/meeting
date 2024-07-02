@@ -28,7 +28,7 @@ public class JwtTool {
      * @param
      * @return access-token
      */
-    public String createToken(Integer userId, Duration ttl) {
+    public String createToken(Long userId, Duration ttl) {
         // 1.生成jws
         return JWT.create()
                 .setPayload("user", userId)
