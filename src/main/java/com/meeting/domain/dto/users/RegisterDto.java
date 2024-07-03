@@ -1,4 +1,4 @@
-package com.meeting.domain.dtos;
+package com.meeting.domain.dto.users;
 
 import lombok.Data;
 

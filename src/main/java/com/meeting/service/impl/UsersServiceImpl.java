@@ -7,10 +7,8 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.meeting.commen.result.Result;
 import com.meeting.config.JwtProperties;
-import com.meeting.domain.dtos.LoginDto;
-import com.meeting.domain.dtos.PasswordDto;
-import com.meeting.domain.dtos.RegisterDto;
-import com.meeting.domain.dtos.UpdateInfoDto;
+
+import com.meeting.domain.dto.users.*;
 import com.meeting.domain.pojos.Users;
 import com.meeting.domain.vos.LoginVo;
 import com.meeting.mapper.UsersMapper;
@@ -56,7 +54,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
         BeanUtils.copyProperties(registerDto, user);
         // 3. 生成唯一account
         user.setAccount("U" + System.currentTimeMillis());
-        user.setRole(3);//未激活
+        user.setRole(2);//未激活
         // 4. 保存
         save(user);
         return Result.succ("注册成功,请等待管理员审核");
@@ -74,7 +72,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
         if (user == null) {
             return Result.fail("用户不存在");
         }
-        if (user.getRole()==3){
+        if (user.getRole()==2){
             return Result.fail("用户未激活");
         }
         // 2. 校验密码
@@ -152,6 +150,46 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
         BeanUtils.copyProperties(updateInfoDto, user);
         usersMapper.updateById(user);
         return Result.succ("修改成功");
+    }
+
+    /**
+     * 审核通知
+     * @param confirmDto
+     * @return
+     */
+    //TODO 应做成批量处理更为合理
+    @Override
+    public Result confirm(ConfirmDto confirmDto) {
+        // 1. 校验权限
+        Long userId = UserContext.getUser();
+        Users user = usersMapper.selectById(userId);
+        if (user.getRole() != 1) {
+            return Result.fail("权限不足");
+        }
+        // 2. 修改用户状态
+        Integer status = confirmDto.getStatus();
+        if (status == 0) {
+            // 未通过
+            Users updateUser = new Users();
+            updateUser.setId(confirmDto.getUserId());
+            updateUser.setRole(3);
+            usersMapper.updateById(updateUser);
+            Users u = usersMapper.selectById(confirmDto.getUserId());
+            String title = "会议室预约系统";
+            String content = "您的账号未通过审核，未通过审核原因："+confirmDto.getReason();
+            emailTool.sendEmail(u.getEmail(), content, title);
+            return Result.succ("审核成功");
+        }
+        Users updateUser = new Users();
+        updateUser.setId(confirmDto.getUserId());
+        updateUser.setRole(0);
+        usersMapper.updateById(updateUser);
+        // 3. 发送邮件
+        Users u = usersMapper.selectById(confirmDto.getUserId());
+        String title = "会议室预约系统";
+        String content = "您的账号已通过审核，可以正常使用系统.用户唯一id为："+u.getAccount();
+        emailTool.sendEmail(u.getEmail(), content, title);
+        return Result.succ("审核成功");
     }
 }
 

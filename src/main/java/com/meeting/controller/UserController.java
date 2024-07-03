@@ -1,10 +1,8 @@
 package com.meeting.controller;
 
 import com.meeting.commen.result.Result;
-import com.meeting.domain.dtos.LoginDto;
-import com.meeting.domain.dtos.PasswordDto;
-import com.meeting.domain.dtos.RegisterDto;
-import com.meeting.domain.dtos.UpdateInfoDto;
+
+import com.meeting.domain.dto.users.*;
 import com.meeting.service.UsersService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -50,5 +48,12 @@ public class UserController {
         // 修改个人信息
         return userService.updateInfo(updateInfoDto);
     }
+    @ApiOperation("审核通知")
+    @PostMapping("/confirm")
+    public Result confirm(@RequestBody ConfirmDto confirmDto) {
+        // 审核通知
+        return userService.confirm(confirmDto);
+    }
+
 
 }
