@@ -53,7 +53,10 @@ public class Meetings implements Serializable {
      */
     private String description;
     private Integer status;
-
+    /** 0 未审批 ，1 被拒绝 ，2 未开始，3进行中，4 已结束
+     *
+     *
+     */
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 }

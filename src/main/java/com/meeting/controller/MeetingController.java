@@ -33,7 +33,7 @@ public class MeetingController {
     private MeetingsService meetingsService;
     @Resource
     private RoomsService roomsService;
-    @Autowired
+    @Resource
     private StringRedisTemplate redisTemplate;
 
     @GetMapping("/available")
@@ -41,25 +41,26 @@ public class MeetingController {
                                          @RequestParam("end") @DateTimeFormat(pattern="yyyy-MM-dd HH:mm:ss") Date endTime) {
         return roomsService.getAvailableRooms(startTime, endTime);
     }
-
+    @ApiOperation("会议预订")
     @PostMapping("/book")
     public Result bookMeeting(@RequestBody MeetingsRequest meetingsRequest) {
         if (meetingsRequest == null) {
-            throw new UnauthorizedException("请求错误");
+            return Result.fail("请求错误");
         }
-        String key = "room:" + meetingsRequest.getRoom_id();
-        String field = meetingsRequest.getStart_time().getTime() + "-" + meetingsRequest.getEnd_time().getTime();
-        String status = (String) redisTemplate.opsForHash().get(key, field);
-        if (status !="1") {
-            throw new UnauthorizedException("会议室不可使用");
-        }
-
+        String key = "meeting:book:" + meetingsRequest.getRoom_id();
+        Date startTime = meetingsRequest.getStart_time();
+        Date endTime   = meetingsRequest.getEnd_time();
+         boolean a = meetingsService.checkMeetingTime(meetingsRequest.getRoom_id(),startTime,endTime);
+         if (!a) {
+             return Result.fail("会议室时间冲突，请重新选择");
+         }
         Meetings meetings = new Meetings();
         BeanUtils.copyProperties(meetingsRequest, meetings);
+        meetings.setStatus(0);
         boolean result = meetingsService.save(meetings);
-        meetingsService.bookRoom(meetings);//更新会议室状态为2
         return Result.succ(200,"预定成功",meetings);
     }
+
     @ApiOperation("会议审批")
     @PostMapping("/confirm")
     public Result confirmMeeting(@RequestBody MeetingConfirmDto meetingConfirmDto) {

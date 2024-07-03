@@ -7,11 +7,11 @@ import com.meeting.mapper.RoomsMapper;
 import com.meeting.service.RoomsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
 * @author shanmingxi
@@ -24,31 +24,39 @@ public class RoomsServiceImpl extends ServiceImpl<RoomsMapper, Rooms>
     @Autowired
     private StringRedisTemplate redisTemplate;
 
-    public void initializeRoomStatus(List<Rooms> rooms) {
-        for (Rooms room : rooms) {
-            String key = "room:" + room.getId();
-            // 初始化每个会议室的状态为未占用
-            redisTemplate.opsForHash().put(key, "status", "0");
-        }
-    }
+
     public List<Rooms> getAvailableRooms(Date startTime, Date endTime) {
-        List<Rooms> availableRooms = new ArrayList<>();
-        String start = String.valueOf(startTime.getTime());
-        String end = String.valueOf(endTime.getTime());
-        String field = start + "-" + end;
-
-        // 假设你有一个方法来获取所有会议室信息
+        Set<Integer> unavailableRooms = new HashSet<>();
         List<Rooms> allRooms =this.list();
+        // 格式化时间
+        long start = startTime.getTime();
+        long end = endTime.getTime();
 
+
+        // 检查每个会议室的有序集合
         for (Rooms room : allRooms) {
             String key = "room:" + room.getId();
-            String status = (String) redisTemplate.opsForHash().get(key, field);
+            Set<ZSetOperations.TypedTuple<String>> meetings = redisTemplate.opsForZSet().rangeByScoreWithScores(key, Double.MIN_VALUE, end);
 
-            if (status == null || status.equals("1")) {
-                availableRooms.add(room);
+            if (meetings != null && !meetings.isEmpty()) {
+                // 检查时间重叠
+                for (ZSetOperations.TypedTuple<String> meeting : meetings) {
+                    long meetingStart = Long.parseLong(meeting.getValue());
+                    double meetingEnd = meeting.getScore();
+
+                    if (meetingEnd > start&&meetingStart<end) {
+                        unavailableRooms.add(room.getId());
+                        break;
+                    }
+                }
             }
         }
-        return availableRooms;
+
+
+        // 返回可用的会议室
+        return allRooms.stream()
+                .filter(room -> !unavailableRooms.contains(room.getId()))
+                .collect(Collectors.toList());
     }
 }
 

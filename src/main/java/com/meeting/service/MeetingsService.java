@@ -6,14 +6,14 @@ import com.meeting.commen.result.Result;
 import com.meeting.domain.dto.meetings.MeetingConfirmDto;
 import com.meeting.domain.pojos.Meetings;
 
+import java.util.Date;
+
 /**
 * @author shanmingxi
 * @description 针对表【meetings】的数据库操作Service
 * @createDate 2024-07-01 16:57:41
 */
 public interface MeetingsService extends IService<Meetings> {
-    public void bookRoom(Meetings meeting);
-    public void releaseRoom(Meetings meeting);
 
     /**
      * 确认会议
@@ -21,4 +21,5 @@ public interface MeetingsService extends IService<Meetings> {
      * @return
      */
     Result confirmMeeting(MeetingConfirmDto meetingConfirmDto);
+    boolean checkMeetingTime(Integer roomId, Date startTime, Date endTime);
 }

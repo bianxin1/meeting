@@ -38,20 +38,6 @@ public class MeetingsServiceImpl extends ServiceImpl<MeetingsMapper, Meetings>
     @Autowired
     private StringRedisTemplate redisTemplate;
 
-    public void bookRoom(Meetings meeting) {
-/*        String key = "room:" + meeting.getRoom_id();
-        String field = meeting.getStart_time().getTime() + "-" + meeting.getEnd_time().getTime();
-        // 更新会议室状态为已占用
-        redisTemplate.opsForHash().put(key, field, "2");*/
-
-    }
-
-    public void releaseRoom(Meetings meeting) {
-/*        String key = "room:" + meeting.getRoom_id();
-        String field = meeting.getStart_time().getTime() + "-" + meeting.getEnd_time().getTime();
-        // 更新会议室状态为未占用
-        redisTemplate.opsForHash().put(key, field, "0");*/
-    }
 
     /**
      * 确认会议
@@ -102,7 +88,7 @@ public class MeetingsServiceImpl extends ServiceImpl<MeetingsMapper, Meetings>
             redisTemplate.delete(lockKey); // 释放锁
         }
     }
-    private boolean checkMeetingTime(Integer roomId, Date startTime, Date endTime) {
+    public boolean checkMeetingTime(Integer roomId, Date startTime, Date endTime) {
         String key = "meeting:book"+roomId;
         Set<ZSetOperations.TypedTuple<String>> bookings = redisTemplate.opsForZSet().rangeWithScores(key, 0, -1);
         if (bookings == null) {

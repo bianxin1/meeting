@@ -13,6 +13,6 @@ import java.util.List;
 * @createDate 2024-07-01 17:56:16
 */
 public interface RoomsService extends IService<Rooms> {
-    public void initializeRoomStatus(List<Rooms> rooms);
+
     public List<Rooms> getAvailableRooms(Date startTime, Date endTime);
 }
