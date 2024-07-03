@@ -7,10 +7,11 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.meeting.commen.result.Result;
 import com.meeting.config.JwtProperties;
-import com.meeting.domain.dtos.LoginDto;
-import com.meeting.domain.dtos.PasswordDto;
-import com.meeting.domain.dtos.RegisterDto;
-import com.meeting.domain.dtos.UpdateInfoDto;
+
+import com.meeting.domain.dto.users.LoginDto;
+import com.meeting.domain.dto.users.PasswordDto;
+import com.meeting.domain.dto.users.RegisterDto;
+import com.meeting.domain.dto.users.UpdateInfoDto;
 import com.meeting.domain.pojos.Users;
 import com.meeting.domain.vos.LoginVo;
 import com.meeting.mapper.UsersMapper;
