@@ -10,5 +10,6 @@ import com.meeting.domain.pojos.Meetings;
 * @createDate 2024-07-01 16:57:41
 */
 public interface MeetingsService extends IService<Meetings> {
-
+    public void bookRoom(Meetings meeting);
+    public void releaseRoom(Meetings meeting);
 }

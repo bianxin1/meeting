@@ -9,6 +9,7 @@ import com.meeting.mapper.MeetingsMapper;
 import com.meeting.mapper.RoomsMapper;
 import com.meeting.service.MeetingsService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -27,34 +28,25 @@ public class MeetingsServiceImpl extends ServiceImpl<MeetingsMapper, Meetings>
 
     @Autowired
     private MeetingsMapper meetingMapper;
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
-    /**
-     * 查询指定时间段内的会议室状态
-     */
-    public List<Rooms> getRoomsStatus(Date startTime, Date endTime) {
-        // 查询所有会议室
-        List<Rooms> rooms = roomMapper.selectList(null);
+    public void bookRoom(Meetings meeting) {
+        String key = "room:" + meeting.getRoom_id();
+        String field = meeting.getStart_time().getTime() + "-" + meeting.getEnd_time().getTime();
+        // 更新会议室状态为已占用
+        redisTemplate.opsForHash().put(key, field, "2");
 
-        for (Rooms room : rooms) {
-            // 检查会议室在指定时间段内是否有会议
-            QueryWrapper<Meetings> queryWrapper = new QueryWrapper<>();
-            queryWrapper.eq("room_id", room.getId())
-                    .and(wrapper -> wrapper.between("start_time", startTime, endTime)
-                            .or()
-                            .between("end_time", startTime, endTime)
-                            .or()
-                            .and(innerWrapper -> innerWrapper.le("start_time", startTime)
-                                    .ge("end_time", endTime)));
-            List<Meetings> meetings = meetingMapper.selectList(queryWrapper);
-            if (meetings.isEmpty()) {
-                room.setStatus(1); // 可用
-            } else {
-                room.setStatus(2); // 已占用
-            }
-        }
-
-        return rooms;
     }
+
+    public void releaseRoom(Meetings meeting) {
+        String key = "room:" + meeting.getRoom_id();
+        String field = meeting.getStart_time().getTime() + "-" + meeting.getEnd_time().getTime();
+        // 更新会议室状态为未占用
+        redisTemplate.opsForHash().put(key, field, "0");
+    }
+
+
 }
 
 
