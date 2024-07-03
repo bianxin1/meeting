@@ -3,10 +3,7 @@ package com.meeting.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.meeting.commen.result.Result;
 
-import com.meeting.domain.dto.users.LoginDto;
-import com.meeting.domain.dto.users.PasswordDto;
-import com.meeting.domain.dto.users.RegisterDto;
-import com.meeting.domain.dto.users.UpdateInfoDto;
+import com.meeting.domain.dto.users.*;
 import com.meeting.domain.pojos.Users;
 
 /**
@@ -48,4 +45,11 @@ public interface UsersService extends IService<Users> {
      * @return
      */
     Result updateInfo(UpdateInfoDto updateInfoDto);
+
+    /**
+     * 审核通知
+     * @param confirmDto
+     * @return
+     */
+    Result confirm(ConfirmDto confirmDto);
 }

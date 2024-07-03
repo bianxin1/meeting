@@ -5,6 +5,6 @@ import lombok.Data;
 @Data
 public class LoginVo {
     String token;
-    Integer id;
+    Long id;
     String account;
 }
