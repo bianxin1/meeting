@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Data;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 public class MeetingsRequest {
@@ -22,25 +23,27 @@ public class MeetingsRequest {
     /**
      *
      */
-    private Integer participant_count;
+    private Integer participantCount;
 
     /**
      *
      */
-    private Integer room_id;
+    private Integer roomId;
 
     /**
      *
      */
-    private Date start_time;
+    private Date startTime;
 
     /**
      *
      */
-    private Date end_time;
+    private Date endTime;
 
     /**
      *
      */
     private String description;
+
+    private List<Long> usersIds;
 }
