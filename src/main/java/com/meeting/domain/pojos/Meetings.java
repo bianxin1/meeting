@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.models.auth.In;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -30,27 +31,28 @@ public class Meetings implements Serializable {
     /**
      * 
      */
-    private Integer participant_count;
+    private Integer participantCount;
 
     /**
      * 
      */
-    private Integer room_id;
+    private Integer roomId;
 
     /**
      * 
      */
-    private Date start_time;
+    private Date startTime;
 
     /**
      * 
      */
-    private Date end_time;
+    private Date endTime;
 
     /**
      * 
      */
     private String description;
+    private Integer status;
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;

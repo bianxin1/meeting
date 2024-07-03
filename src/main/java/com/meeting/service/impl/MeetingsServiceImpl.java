@@ -2,7 +2,10 @@ package com.meeting.service.impl;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.meeting.commen.result.Result;
+import com.meeting.domain.dto.meetings.MeetingConfirmDto;
 import com.meeting.domain.pojos.Meetings;
 import com.meeting.domain.pojos.Rooms;
 import com.meeting.mapper.MeetingsMapper;
@@ -10,10 +13,14 @@ import com.meeting.mapper.RoomsMapper;
 import com.meeting.service.MeetingsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 /**
 * @author shanmingxi
@@ -32,18 +39,85 @@ public class MeetingsServiceImpl extends ServiceImpl<MeetingsMapper, Meetings>
     private StringRedisTemplate redisTemplate;
 
     public void bookRoom(Meetings meeting) {
-        String key = "room:" + meeting.getRoom_id();
+/*        String key = "room:" + meeting.getRoom_id();
         String field = meeting.getStart_time().getTime() + "-" + meeting.getEnd_time().getTime();
         // 更新会议室状态为已占用
-        redisTemplate.opsForHash().put(key, field, "2");
+        redisTemplate.opsForHash().put(key, field, "2");*/
 
     }
 
     public void releaseRoom(Meetings meeting) {
-        String key = "room:" + meeting.getRoom_id();
+/*        String key = "room:" + meeting.getRoom_id();
         String field = meeting.getStart_time().getTime() + "-" + meeting.getEnd_time().getTime();
         // 更新会议室状态为未占用
-        redisTemplate.opsForHash().put(key, field, "0");
+        redisTemplate.opsForHash().put(key, field, "0");*/
+    }
+
+    /**
+     * 确认会议
+     * @param meetingConfirmDto
+     * @return
+     */
+    @Override
+    public Result confirmMeeting(MeetingConfirmDto meetingConfirmDto) {
+        // 1. 校验会议是否存在
+        Meetings meeting = meetingMapper.selectById(meetingConfirmDto.getMeetingId());
+        if (meeting == null||meeting.getStatus()!=0) {
+            return Result.fail("会议不存在或已审批");
+        }
+        // 2. 使用redis校验会议时间是否合法
+        boolean isAvailable = checkMeetingTime(meetingConfirmDto.getRoomId(),meetingConfirmDto.getStartTime(),meetingConfirmDto.getEndTime());
+        if (!isAvailable) {
+            return Result.fail("会议室时间冲突");
+        }
+        // 3. 更新会议状态
+        String lockKey = "lock:meeting:book:" + meetingConfirmDto.getRoomId();
+        boolean lockAcquired = Boolean.TRUE.equals(redisTemplate.opsForValue().setIfAbsent(lockKey, "lock", 10, TimeUnit.SECONDS));
+        if (!lockAcquired) {
+            return Result.fail("无法获取分布式锁，稍后重试");
+        }
+
+        try {
+            // 再次校验时间，防止在获取锁之前有其他操作修改了数据
+            isAvailable = checkMeetingTime(meetingConfirmDto.getRoomId(), meetingConfirmDto.getStartTime(), meetingConfirmDto.getEndTime());
+            if (!isAvailable) {
+                return Result.fail("会议室时间冲突");
+            }
+
+            // 4. 更新会议状态
+            meeting.setStatus(1);
+            // 只有status为0的会议才能被审批
+            UpdateWrapper<Meetings> updateWrapper = new UpdateWrapper<>();
+            updateWrapper.eq("id", meeting.getId()).eq("status", 0);
+            meetingMapper.update(meeting, updateWrapper);
+            // 5. 更新redis缓存
+            String key = "meeting:book:" + meeting.getRoomId();
+            String startTimeString = String.valueOf(meetingConfirmDto.getStartTime().getTime());
+            String endTimeString = String.valueOf(meetingConfirmDto.getEndTime().getTime());
+
+            redisTemplate.opsForZSet().add(key, startTimeString, Double.parseDouble(endTimeString));
+
+            return Result.succ("审批成功");
+        } finally {
+            redisTemplate.delete(lockKey); // 释放锁
+        }
+    }
+    private boolean checkMeetingTime(Integer roomId, Date startTime, Date endTime) {
+        String key = "meeting:book"+roomId;
+        Set<ZSetOperations.TypedTuple<String>> bookings = redisTemplate.opsForZSet().rangeWithScores(key, 0, -1);
+        if (bookings == null) {
+            return true;
+        }
+        long start = startTime.getTime();
+        long end = endTime.getTime();
+        for (ZSetOperations.TypedTuple<String> booking : bookings) {
+            long bookedStart = Long.parseLong(Objects.requireNonNull(booking.getValue()));
+            long bookedEnd = Objects.requireNonNull(booking.getScore()).longValue();
+            if (start < bookedEnd && end > bookedStart) {
+                return false; // 时间段冲突
+            }
+        }
+        return true;
     }
 
 

@@ -1,6 +1,7 @@
 package com.meeting.controller;
 
 import com.meeting.commen.result.Result;
+import com.meeting.domain.dto.meetings.MeetingConfirmDto;
 import com.meeting.domain.dto.meetings.MeetingsRequest;
 import com.meeting.domain.dto.rooms.RoomsAddRequest;
 import com.meeting.domain.pojos.Meetings;
@@ -9,6 +10,8 @@ import com.meeting.expection.CommonException;
 import com.meeting.expection.UnauthorizedException;
 import com.meeting.service.MeetingsService;
 import com.meeting.service.RoomsService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.BeanUtils;
@@ -21,7 +24,7 @@ import javax.annotation.Resource;
 
 import java.util.Date;
 import java.util.List;
-
+@Api(tags = "会议管理")
 @RestController
 @Slf4j
 @RequestMapping("/meeting")
@@ -57,5 +60,9 @@ public class MeetingController {
         meetingsService.bookRoom(meetings);//更新会议室状态为2
         return Result.succ(200,"预定成功",meetings);
     }
-
+    @ApiOperation("会议审批")
+    @PostMapping("/confirm")
+    public Result confirmMeeting(@RequestBody MeetingConfirmDto meetingConfirmDto) {
+        return meetingsService.confirmMeeting(meetingConfirmDto);
+    }
 }
