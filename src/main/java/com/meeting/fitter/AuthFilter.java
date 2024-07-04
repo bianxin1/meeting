@@ -22,46 +22,46 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
-@Component
-@RequiredArgsConstructor
-@EnableConfigurationProperties(AuthProperties.class)
-public class AuthFilter extends OncePerRequestFilter {
-    private final JwtTool jwtTool;
-    private final AuthProperties authProperties;
-    private final AntPathMatcher antPathMatcher = new AntPathMatcher();
-
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
-        String path = request.getRequestURI();
-        if (isExclude(path)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        String token = null;
-        List<String> headers = Collections.list(request.getHeaders("Authorization"));
-        if (!CollectionUtils.isEmpty(headers)) {
-            token = headers.get(0);
-        }
-
-        Long userId = null;
-        try {
-            userId = jwtTool.parseToken(token);
-        } catch (UnauthorizedException e) {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            return;
-        }
-        UserContext.setUser(userId);
-        filterChain.doFilter(request, response);
-    }
-
-    private boolean isExclude(String path) {
-        for (String pathPattern : authProperties.getExcludePaths()) {
-            if (antPathMatcher.match(pathPattern, path)) {
-                return true;
-            }
-        }
-        return false;
-    }
-}
+//@Component
+//@RequiredArgsConstructor
+//@EnableConfigurationProperties(AuthProperties.class)
+//public class AuthFilter extends OncePerRequestFilter {
+//    private final JwtTool jwtTool;
+//    private final AuthProperties authProperties;
+//    private final AntPathMatcher antPathMatcher = new AntPathMatcher();
+//
+//    @Override
+//    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+//            throws ServletException, IOException {
+//        String path = request.getRequestURI();
+//        if (isExclude(path)) {
+//            filterChain.doFilter(request, response);
+//            return;
+//        }
+//
+//        String token = null;
+//        List<String> headers = Collections.list(request.getHeaders("Authorization"));
+//        if (!CollectionUtils.isEmpty(headers)) {
+//            token = headers.get(0);
+//        }
+//
+//        Long userId = null;
+//        try {
+//            userId = jwtTool.parseToken(token);
+//        } catch (UnauthorizedException e) {
+//            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+//            return;
+//        }
+//        UserContext.setUser(userId);
+//        filterChain.doFilter(request, response);
+//    }
+//
+//    private boolean isExclude(String path) {
+//        for (String pathPattern : authProperties.getExcludePaths()) {
+//            if (antPathMatcher.match(pathPattern, path)) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
+//}

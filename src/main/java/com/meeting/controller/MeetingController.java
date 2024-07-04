@@ -7,28 +7,31 @@ import com.meeting.domain.dto.meetings.MeetingConfirmDto;
 import com.meeting.domain.dto.meetings.MeetingQueryRequest;
 import com.meeting.domain.dto.meetings.MeetingsRequest;
 import com.meeting.domain.dto.meetings.MeetingsTimeDTO;
+import com.meeting.domain.pojos.MeetingParticipants;
 import com.meeting.domain.pojos.Meetings;
 import com.meeting.domain.pojos.Rooms;
-<<<<<<< HEAD
+
+import com.meeting.domain.pojos.Users;
+import com.meeting.domain.vos.MeetingDetailsVo;
 import com.meeting.expection.CommonException;
 import com.meeting.expection.UnauthorizedException;
 import com.meeting.service.MeetingParticipantsService;
-=======
->>>>>>> origin/master
+
 import com.meeting.service.MeetingsService;
 import com.meeting.service.RoomsService;
+import com.meeting.service.UsersService;
 import com.meeting.utils.CacheClient;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
-<<<<<<< HEAD
 import javax.servlet.http.HttpServletRequest;
 
-=======
->>>>>>> origin/master
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -45,11 +48,13 @@ public class MeetingController {
     private RoomsService roomsService;
     @Resource
     private CacheClient cacheClient;
-<<<<<<< HEAD
+    @Resource
+    private UsersService usersService;
     @Resource
     private MeetingParticipantsService meetingParticipantsService;
-=======
->>>>>>> origin/master
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+
 
     @ApiOperation("在指定时间段内查询可用的会议室")
     @PostMapping("/available")
@@ -76,11 +81,8 @@ public class MeetingController {
         boolean result = meetingsService.save(meetings);
         // 把会议的参会人员暂存到redis中
         List<Long> usersIds = meetingsRequest.getUsersIds();
-<<<<<<< HEAD
-        String HuiYiHumanKey = "meeting:users:" + meetingsRequest.getId();
-=======
         String HuiYiHumanKey = MEETING_USERS_KEY + meetings.getId();
->>>>>>> origin/master
+
         cacheClient.set(HuiYiHumanKey, usersIds, 1L, TimeUnit.DAYS);
         return Result.succ(200, "预定成功", meetings);
     }
@@ -100,22 +102,36 @@ public class MeetingController {
 
     @ApiOperation("管理员会议分页查询")
     @PostMapping("/search")
-    public Result listMeetingByPage(@RequestBody MeetingQueryRequest meetingQueryRequest,
+    public Page<Meetings> listMeetingByPage(@RequestBody MeetingQueryRequest meetingQueryRequest,
                                  HttpServletRequest request) {
         long current = meetingQueryRequest.getCurrent();
         long size = meetingQueryRequest.getPageSize();
         Page<Meetings> meetingsPage = meetingsService.page(new Page<>(current, size),
                 meetingsService.getQueryWrapper(meetingQueryRequest));
-        return Result.succ(meetingsPage);
+        return meetingsPage;
     }
 
     @ApiOperation("查看会议的详细信息")
     @GetMapping("/search/{id}")
     public Result MeetingsDetails(@PathVariable Integer id) {
-        Meetings m = meetingsService.getById(id);
+        Meetings meetings = meetingsService.getById(id);
+        QueryWrapper<MeetingParticipants> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("meeting_id", id);
+        List<MeetingParticipants> meetingParticipants = meetingParticipantsService.list(queryWrapper);
+        List<Users> usersList = new ArrayList<>();
+        for (MeetingParticipants participant : meetingParticipants) {
+            Long userId = participant.getUserId();
+            Users users = usersService.getById(userId);
+            if (users != null) {
+                usersList.add(users);
+            }
+        }
+            MeetingDetailsVo meetingDetailsVo = new MeetingDetailsVo();
+            BeanUtils.copyProperties(meetings, meetingDetailsVo);
+            meetingDetailsVo.setUsers(usersList);
 
-        return Result.succ(meetingsPage);
-    }
+            return Result.succ(meetingDetailsVo);
+        }
 ///**
 //    @ApiOperation("会议审批")
 //    @PostMapping("/confirm")
@@ -123,5 +139,4 @@ public class MeetingController {
 //        return meetingsService.confirmMeeting(meetingConfirmDto);
 //    }
 
-
-}
+    }

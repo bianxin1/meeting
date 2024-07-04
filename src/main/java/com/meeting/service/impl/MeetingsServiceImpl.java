@@ -2,6 +2,7 @@ package com.meeting.service.impl;
 
 
 import cn.hutool.json.JSONUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -147,10 +148,10 @@ public class MeetingsServiceImpl extends ServiceImpl<MeetingsMapper, Meetings>
 
         QueryWrapper<Meetings> queryWrapper = new QueryWrapper<>();
         queryWrapper.eq(id != null, "id", id);
-        queryWrapper.eq(roomId!=null, "roomId", roomId);
-        queryWrapper.eq(participantCount!=null, "participantCount", participantCount);
-        queryWrapper.eq(startTime!=null, "startTime", startTime);
-        queryWrapper.eq(startTime!=null, "startTime", startTime);
+        queryWrapper.eq(roomId!=null, "room_id", roomId);
+        queryWrapper.eq(participantCount!=null, "participant_count", participantCount);
+        queryWrapper.eq(startTime!=null, "start_time", startTime);
+        queryWrapper.eq(endTime!=null, "end_time", startTime);
         queryWrapper.like(StringUtils.isNotBlank(name), "name", name);
         queryWrapper.orderByAsc("id");
         return queryWrapper;

@@ -1,5 +1,6 @@
 package com.meeting.domain.vos;
 
+import com.meeting.domain.pojos.Users;
 import lombok.Data;
 import org.apache.catalina.User;
 
@@ -40,5 +41,5 @@ public class MeetingDetailsVo { private Integer id;
      *
      */
     private Integer status;
-    private List<User> users;
+    private List<Users> users;
 }
