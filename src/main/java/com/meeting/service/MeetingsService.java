@@ -7,6 +7,7 @@ import com.meeting.commen.result.Result;
 import com.meeting.domain.dto.meetings.MeetingConfirmDto;
 import com.meeting.domain.dto.meetings.MeetingQueryRequest;
 import com.meeting.domain.pojos.Meetings;
+import com.meeting.domain.vos.MeetingDetailsVo;
 
 import java.util.Date;
 
@@ -25,4 +26,6 @@ public interface MeetingsService extends IService<Meetings> {
     Result confirmMeeting(MeetingConfirmDto meetingConfirmDto);
     boolean checkMeetingTime(Integer roomId, Date startTime, Date endTime);
     public QueryWrapper<Meetings> getQueryWrapper(MeetingQueryRequest meetingQueryRequest);
+
+    MeetingDetailsVo searchMeetingDetails(Integer id);
 }

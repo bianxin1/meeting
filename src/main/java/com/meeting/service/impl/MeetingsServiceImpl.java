@@ -11,22 +11,26 @@ import com.meeting.commen.result.Result;
 import com.meeting.domain.dto.meetings.MeetingConfirmDto;
 import com.meeting.domain.dto.meetings.MeetingQueryRequest;
 import com.meeting.domain.dto.meetings.UserMeetingMessage;
+import com.meeting.domain.pojos.MeetingParticipants;
 import com.meeting.domain.pojos.Meetings;
+import com.meeting.domain.pojos.Users;
+import com.meeting.domain.vos.MeetingDetailsVo;
 import com.meeting.mapper.MeetingsMapper;
 import com.meeting.mapper.RoomsMapper;
 import com.meeting.mapper.UsersMapper;
+import com.meeting.service.MeetingParticipantsService;
 import com.meeting.service.MeetingsService;
+import com.meeting.service.UsersService;
 import com.meeting.utils.UserContext;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
+import javax.annotation.Resource;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import static com.meeting.commen.constants.RedisKey.*;
@@ -49,7 +53,10 @@ public class MeetingsServiceImpl extends ServiceImpl<MeetingsMapper, Meetings>
     private RabbitTemplate rabbitTemplate;
     @Autowired
     private RoomsMapper roomMapper;
-
+    @Resource
+    private UsersService usersService;
+    @Resource
+    private MeetingParticipantsService meetingParticipantsService;
     /**
      * 确认会议
      * @param meetingConfirmDto
@@ -155,6 +162,26 @@ public class MeetingsServiceImpl extends ServiceImpl<MeetingsMapper, Meetings>
         queryWrapper.like(StringUtils.isNotBlank(name), "name", name);
         queryWrapper.orderByAsc("id");
         return queryWrapper;
+    }
+
+    @Override
+    public MeetingDetailsVo searchMeetingDetails(Integer id) {
+        Meetings meetings = getById(id);
+        QueryWrapper<MeetingParticipants> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("meeting_id", id);
+        List<MeetingParticipants> meetingParticipants = meetingParticipantsService.list(queryWrapper);
+        List<Users> usersList = new ArrayList<>();
+        for (MeetingParticipants participant : meetingParticipants) {
+            Long userId = participant.getUserId();
+            Users users = usersService.getById(userId);
+            if (users != null) {
+                usersList.add(users);
+            }
+        }
+        MeetingDetailsVo meetingDetailsVo = new MeetingDetailsVo();
+        BeanUtils.copyProperties(meetings, meetingDetailsVo);
+        meetingDetailsVo.setUsers(usersList);
+        return meetingDetailsVo;
     }
 
 }
