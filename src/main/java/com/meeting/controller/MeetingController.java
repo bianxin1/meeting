@@ -2,6 +2,7 @@ package com.meeting.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.meeting.commen.annotation.RoleCheck;
 import com.meeting.commen.result.Result;
 import com.meeting.domain.dto.meetings.MeetingConfirmDto;
 import com.meeting.domain.dto.meetings.MeetingQueryRequest;
@@ -101,6 +102,7 @@ public class MeetingController {
     }
 
     @ApiOperation("管理员会议分页查询")
+    @RoleCheck(requiredRole = 1)
     @PostMapping("/search")
     public Page<Meetings> listMeetingByPage(@RequestBody MeetingQueryRequest meetingQueryRequest,
                                  HttpServletRequest request) {

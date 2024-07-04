@@ -2,6 +2,8 @@ package com.meeting.utils;
 
 import com.meeting.commen.annotation.RoleCheck;
 import com.meeting.domain.pojos.Users;
+import com.meeting.mapper.UsersMapper;
+import com.meeting.service.UsersService;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -15,14 +17,15 @@ import java.lang.reflect.Method;
 @Aspect
 @Component
 public class RoleCheckAspect {
-
-    @Autowired
-    private HttpSession session;
+   @Autowired
+   private UsersMapper usersMapper;
+    
 
     @Before("@annotation(com.meeting.commen.annotation.RoleCheck)")
     public void checkRole(JoinPoint joinPoint) throws Throwable {
         // 获取当前用户的角色
-        Users currentUser = (Users) session.getAttribute("currentUser");
+        Long userId = UserContext.getUser();
+        Users currentUser = usersMapper.selectById(userId);
         if (currentUser == null) {
             throw new RuntimeException("User not logged in");
         }
@@ -38,7 +41,7 @@ public class RoleCheckAspect {
             int requiredRole = roleCheck.requiredRole();
 
             // 检查用户角色是否满足要求
-            if (currentUser.getRole() < requiredRole) {
+            if (currentUser.getRole() != requiredRole) {
                 throw new RuntimeException("角色不满足要求");
             }
         }
