@@ -22,11 +22,13 @@ import com.meeting.service.MeetingParticipantsService;
 import com.meeting.service.MeetingsService;
 import com.meeting.service.UsersService;
 import com.meeting.utils.UserContext;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -40,6 +42,7 @@ import static com.meeting.commen.constants.RedisKey.*;
 * @description 针对表【meetings】的数据库操作Service实现
 * @createDate 2024-07-01 16:57:41
 */
+@Slf4j
 @Service
 public class MeetingsServiceImpl extends ServiceImpl<MeetingsMapper, Meetings>
     implements MeetingsService {
@@ -57,6 +60,8 @@ public class MeetingsServiceImpl extends ServiceImpl<MeetingsMapper, Meetings>
     private UsersService usersService;
     @Resource
     private MeetingParticipantsService meetingParticipantsService;
+    @Resource
+    private MeetingsMapper meetingsMapper;
     /**
      * 确认会议
      * @param meetingConfirmDto
@@ -184,6 +189,27 @@ public class MeetingsServiceImpl extends ServiceImpl<MeetingsMapper, Meetings>
         return meetingDetailsVo;
     }
 
+    @Scheduled(cron = "0 0 * * * ?") // 每个小时开始的第0分钟执行一次
+    public void updateMeetingStatus() {
+        Date now = new Date();
+        List<Meetings> meetings = this.list(); // 获取所有会议
+
+        for (Meetings meeting : meetings) {
+            if (meeting.getStatus() == 0||meeting.getStatus()==1) {
+                continue; // 跳过未审批的会议
+            }
+            if (meeting.getStartTime().before(now) && meeting.getEndTime().after(now)) {
+                // 会议正在进行中
+                meeting.setStatus(3);
+            } else if (meeting.getEndTime().before(now)) {
+                // 会议已结束
+                meeting.setStatus(4);
+            }
+            boolean b = this.updateById(meeting);
+
+
+        }
+    }
 }
 
 
