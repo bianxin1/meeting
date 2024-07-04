@@ -3,9 +3,12 @@ package com.meeting.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.meeting.commen.result.CommonConstant;
 import com.meeting.commen.result.Result;
 import com.meeting.domain.dto.meetings.MeetingConfirmDto;
+import com.meeting.domain.dto.meetings.MeetingQueryRequest;
 import com.meeting.domain.pojos.Meetings;
 import com.meeting.domain.pojos.Rooms;
 import com.meeting.mapper.MeetingsMapper;
@@ -106,6 +109,34 @@ public class MeetingsServiceImpl extends ServiceImpl<MeetingsMapper, Meetings>
         return true;
     }
 
+    public QueryWrapper<Meetings> getQueryWrapper(MeetingQueryRequest meetingQueryRequest) {
+
+//        private Integer id;
+//        private String name;
+//        private Integer participantCount;
+//        private Integer roomId;
+//        private Date startTime;
+//        private Date endTime;
+//        private String description;
+//        private Integer status;
+        Integer id = meetingQueryRequest.getId();
+        String name = meetingQueryRequest.getName();
+        Integer roomId = meetingQueryRequest.getRoomId();
+        Integer participantCount = meetingQueryRequest.getParticipantCount();
+        Date startTime=meetingQueryRequest.getStartTime();
+        Date endTime=meetingQueryRequest.getEndTime();
+        Integer status=meetingQueryRequest.getStatus();
+
+        QueryWrapper<Meetings> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq(id != null, "id", id);
+        queryWrapper.eq(roomId!=null, "roomId", roomId);
+        queryWrapper.eq(participantCount!=null, "participantCount", participantCount);
+        queryWrapper.eq(startTime!=null, "startTime", startTime);
+        queryWrapper.eq(startTime!=null, "startTime", startTime);
+        queryWrapper.like(StringUtils.isNotBlank(name), "name", name);
+        queryWrapper.orderByAsc("id");
+        return queryWrapper;
+    }
 
 }
 

@@ -18,9 +18,11 @@ import com.meeting.utils.JwtTool;
 import com.meeting.utils.UserContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpSession;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
@@ -40,7 +42,8 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
     private final JwtProperties jwtProperties;
     private final UsersMapper usersMapper;
     private final EmailTool emailTool;
-
+    @Autowired
+    private HttpSession session;
 
     @Override
     public Result register(RegisterDto registerDto) {
