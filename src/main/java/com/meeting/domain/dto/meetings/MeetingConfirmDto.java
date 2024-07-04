@@ -10,4 +10,5 @@ public class MeetingConfirmDto {
     private Integer roomId;
     private Date startTime;
     private Date endTime;
+    private Integer confirm;
 }

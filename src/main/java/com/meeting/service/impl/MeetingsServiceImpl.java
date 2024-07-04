@@ -64,7 +64,6 @@ public class MeetingsServiceImpl extends ServiceImpl<MeetingsMapper, Meetings>
      */
     @Override
     public Result confirmMeeting(MeetingConfirmDto meetingConfirmDto) {
-
         if (usersMapper.selectById(UserContext.getUser()).getRole()!=1) {
             return Result.fail("无权限");
         }
@@ -72,6 +71,11 @@ public class MeetingsServiceImpl extends ServiceImpl<MeetingsMapper, Meetings>
         Meetings meeting = meetingMapper.selectById(meetingConfirmDto.getMeetingId());
         if (meeting == null||meeting.getStatus()!=0) {
             return Result.fail("会议不存在或已审批");
+        }
+        if (meetingConfirmDto.getConfirm()!=1){
+            meeting.setStatus(1);
+            meetingMapper.updateById(meeting);
+            return Result.succ("审批成功");
         }
         // 2. 使用redis校验会议时间是否合法
         boolean isAvailable = checkMeetingTime(meetingConfirmDto.getRoomId(),meetingConfirmDto.getStartTime(),meetingConfirmDto.getEndTime());
