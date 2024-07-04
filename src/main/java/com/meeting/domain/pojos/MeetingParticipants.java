@@ -16,12 +16,12 @@ public class MeetingParticipants implements Serializable {
     /**
      * 
      */
-    private Integer meeting_id;
+    private Integer meetingId;
 
     /**
      * 
      */
-    private Integer user_id;
+    private Long userId;
 
     /**
      * 0:未签到，1：已签到 
