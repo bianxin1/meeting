@@ -25,12 +25,12 @@ public class Notifications implements Serializable {
     /**
      * 
      */
-    private Integer user_id;
+    private Integer userId;
 
     /**
      * 
      */
-    private Integer meeting_id;
+    private Integer meetingId;
 
     /**
      * 
@@ -40,7 +40,7 @@ public class Notifications implements Serializable {
     /**
      * 
      */
-    private Integer is_read;
+    private Integer isRead;
 
     /**
      * 
