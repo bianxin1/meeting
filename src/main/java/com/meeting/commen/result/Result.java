@@ -3,10 +3,10 @@ package com.meeting.commen.result;
 import lombok.Data;
 @Data
 
-public class Result {
+public class Result<T> {
     private int code; // 200是正常，非200表示异常
     private String msg;
-    private Object data;
+    private T data;
 
     public static Result succ(Object data) {
         return succ(200, "操作成功", data);

@@ -28,6 +28,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
+
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 
@@ -35,8 +36,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
 import static com.meeting.commen.constants.RedisKey.MEETING_BOOK_KEY;
 import static com.meeting.commen.constants.RedisKey.MEETING_USERS_KEY;
+
 @Api(tags = "会议管理")
 @RestController
 @Slf4j
@@ -103,7 +106,7 @@ public class MeetingController {
     @ApiOperation("管理员会议分页查询")
     @PostMapping("/search")
     public Page<Meetings> listMeetingByPage(@RequestBody MeetingQueryRequest meetingQueryRequest,
-                                 HttpServletRequest request) {
+                                            HttpServletRequest request) {
         long current = meetingQueryRequest.getCurrent();
         long size = meetingQueryRequest.getPageSize();
         Page<Meetings> meetingsPage = meetingsService.page(new Page<>(current, size),
@@ -114,29 +117,13 @@ public class MeetingController {
     @ApiOperation("查看会议的详细信息")
     @GetMapping("/search/{id}")
     public Result MeetingsDetails(@PathVariable Integer id) {
-        Meetings meetings = meetingsService.getById(id);
-        QueryWrapper<MeetingParticipants> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("meeting_id", id);
-        List<MeetingParticipants> meetingParticipants = meetingParticipantsService.list(queryWrapper);
-        List<Users> usersList = new ArrayList<>();
-        for (MeetingParticipants participant : meetingParticipants) {
-            Long userId = participant.getUserId();
-            Users users = usersService.getById(userId);
-            if (users != null) {
-                usersList.add(users);
-            }
-        }
-            MeetingDetailsVo meetingDetailsVo = new MeetingDetailsVo();
-            BeanUtils.copyProperties(meetings, meetingDetailsVo);
-            meetingDetailsVo.setUsers(usersList);
-
-            return Result.succ(meetingDetailsVo);
-        }
-///**
-//    @ApiOperation("会议审批")
-//    @PostMapping("/confirm")
-//    public Result confirmMeeting(@RequestBody MeetingConfirmDto meetingConfirmDto) {
-//        return meetingsService.confirmMeeting(meetingConfirmDto);
-//    }
-
+        return Result.succ(200, "查询成功", meetingsService.searchMeetingDetails(id));
     }
+
+    @ApiOperation("会议审批")
+    @PostMapping("/confirm")
+    public Result confirmMeeting(@RequestBody MeetingConfirmDto meetingConfirmDto) {
+        return meetingsService.confirmMeeting(meetingConfirmDto);
+    }
+
+}

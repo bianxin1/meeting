@@ -2,7 +2,9 @@ package com.meeting.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.meeting.commen.result.ScrollResult;
 import com.meeting.domain.pojos.Notifications;
+import com.meeting.domain.vos.MeetingDetailsVo;
 
 import java.util.List;
 
@@ -19,4 +21,20 @@ public interface NotificationsService extends IService<Notifications> {
      * @param meetingName
      */
     void saveNotifications(Integer meetingId, List<Long> userIds, String meetingName);
+
+    /**
+     * 滚动查询通知
+     * @param max
+     * @param offset
+     * @return
+     */
+    ScrollResult scroll(Long max, Integer offset);
+
+    /**
+     * 标记通知为已读
+     * @param notificationId
+     * @param meetingId
+     * @return
+     */
+    MeetingDetailsVo read(Integer notificationId, Integer meetingId);
 }
