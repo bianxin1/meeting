@@ -8,8 +8,10 @@ import com.meeting.domain.dto.meetings.MeetingConfirmDto;
 import com.meeting.domain.dto.meetings.MeetingQueryRequest;
 import com.meeting.domain.pojos.Meetings;
 import com.meeting.domain.vos.MeetingDetailsVo;
+import com.meeting.domain.vos.UserMeetingVo;
 
 import java.util.Date;
+import java.util.List;
 
 /**
 * @author shanmingxi
@@ -28,4 +30,11 @@ public interface MeetingsService extends IService<Meetings> {
     public QueryWrapper<Meetings> getQueryWrapper(MeetingQueryRequest meetingQueryRequest);
 
     MeetingDetailsVo searchMeetingDetails(Integer id);
+
+    /**
+     * 查询会议列表
+     * @return
+     */
+    List<UserMeetingVo> listMeetingByUser(Integer status);
+
 }

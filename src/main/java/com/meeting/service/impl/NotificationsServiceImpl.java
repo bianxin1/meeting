@@ -67,7 +67,7 @@ public class NotificationsServiceImpl extends ServiceImpl<NotificationsMapper, N
         Long user = UserContext.getUser();
         String key = MEETING_NOTIFICATION_KET + user;
         // 2.查询当前用户的通知列表
-        Set<ZSetOperations.TypedTuple<String>> typedTuples = redisTemplate.opsForZSet().reverseRangeByScoreWithScores(key, 0, max, offset, 10);
+        Set<ZSetOperations.TypedTuple<String>> typedTuples = redisTemplate.opsForZSet().reverseRangeByScoreWithScores(key, 0, max, offset, 6);
         // 2.1判断是否有通知
         if (typedTuples == null || typedTuples.isEmpty()) {
             return new ScrollResult();

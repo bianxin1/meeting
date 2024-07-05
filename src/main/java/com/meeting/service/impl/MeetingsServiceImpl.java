@@ -16,6 +16,7 @@ import com.meeting.domain.pojos.Meetings;
 import com.meeting.domain.pojos.Users;
 import com.meeting.domain.vos.MeetingDetailsVo;
 import com.meeting.domain.vos.UserInfoVo;
+import com.meeting.domain.vos.UserMeetingVo;
 import com.meeting.mapper.MeetingsMapper;
 import com.meeting.mapper.RoomsMapper;
 import com.meeting.mapper.UsersMapper;
@@ -203,6 +204,30 @@ public class MeetingsServiceImpl extends ServiceImpl<MeetingsMapper, Meetings>
         meetingDetailsVo.setRoomName(roomName);;
         meetingDetailsVo.setUsers(userInfoVos);
         return meetingDetailsVo;
+    }
+
+    @Override
+    public List<UserMeetingVo> listMeetingByUser(Integer status) {
+        // 1.获取当前用户
+        Long userId = UserContext.getUser();
+        // 2.查询当前用户的会议信息
+        QueryWrapper<Meetings> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("user_id", userId);
+        queryWrapper.eq(status != null, "status", status);
+        List<Meetings> meetings = list(queryWrapper);
+        // 3.创建一个UserMeetingVo列表
+        List<UserMeetingVo> userMeetingVos = new ArrayList<>();
+        for (Meetings meeting : meetings) {
+            UserMeetingVo userMeetingVo = new UserMeetingVo();
+            BeanUtils.copyProperties(meeting, userMeetingVo);
+            userMeetingVos.add(userMeetingVo);
+        }
+        // 4.封装roomname
+        for (UserMeetingVo userMeetingVo : userMeetingVos) {
+            String roomName = roomMapper.selectById(userMeetingVo.getRoomId()).getName();
+            userMeetingVo.setRoomName(roomName);
+        }
+        return userMeetingVos;
     }
 
     @Scheduled(cron = "0 0 * * * ?") // 每个小时开始的第0分钟执行一次

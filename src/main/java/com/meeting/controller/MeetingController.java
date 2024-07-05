@@ -4,10 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.meeting.commen.annotation.RoleCheck;
 import com.meeting.commen.result.Result;
-import com.meeting.domain.dto.meetings.MeetingConfirmDto;
-import com.meeting.domain.dto.meetings.MeetingQueryRequest;
-import com.meeting.domain.dto.meetings.MeetingsRequest;
-import com.meeting.domain.dto.meetings.MeetingsTimeDTO;
+import com.meeting.domain.dto.meetings.*;
 import com.meeting.domain.pojos.MeetingParticipants;
 import com.meeting.domain.pojos.Meetings;
 import com.meeting.domain.pojos.Rooms;
@@ -95,14 +92,33 @@ public class MeetingController {
 
     @ApiOperation("会议取消")
     @PostMapping("/cancel")
-    public Result cancelMeeting(@RequestBody MeetingsRequest meetingsRequest) {
-        Meetings meetings = new Meetings();
-        BeanUtils.copyProperties(meetingsRequest, meetings);
+    public Result cancelMeeting(@RequestBody CancelMeetingDto cancelMeetingDto) {
+        Meetings meetings = meetingsService.getById(cancelMeetingDto.getMeetingId());
+        if (meetings == null) {
+            return Result.fail("会议不存在");
+        }
+        if (meetings.getStatus() == 3) {
+            return Result.fail("会议已经开始，不能取消");
+        }
+        if (meetings.getStatus() == 4) {
+            return Result.fail("会议已经结束，不能取消");
+        }
+        if (meetings.getStatus() == 5) {
+            return Result.fail("会议已经取消");
+        }
+        if (meetings.getStatus() == 1) {
+            return Result.fail("会议已经被拒绝");
+        }
+        if (meetings.getStatus() == 0) {
+            meetings.setStatus(5);
+            meetingsService.updateById(meetings);
+            return Result.succ(200, "取消成功", meetings);
+        }
         meetings.setStatus(5);
-        boolean result = meetingsService.save(meetings);
+        meetingsService.updateById(meetings);
         //删除redis中的roomId对应的时间数据
-        String key = "meeting:book:" + meetingsRequest.getRoomId();
-        redisTemplate.opsForZSet().remove(key, meetingsRequest.getStartTime(), meetingsRequest.getEndTime());
+        String key = "meeting:book:" + cancelMeetingDto.getRoomId();
+        redisTemplate.opsForZSet().remove(key, cancelMeetingDto.getStartTime(), cancelMeetingDto.getEndTime());
         return Result.succ(200, "取消成功", meetings);
     }
 
@@ -149,5 +165,11 @@ public class MeetingController {
     public Result confirmMeeting(@RequestBody MeetingConfirmDto meetingConfirmDto) {
         return meetingsService.confirmMeeting(meetingConfirmDto);
     }
+    @ApiOperation("查看个人所有会议")
+    @GetMapping("/list")
+    public Result listMeetingByUser(@RequestParam Integer status) {
+        return Result.succ(200, "查询成功", meetingsService.listMeetingByUser(status));
+    }
+
 
 }

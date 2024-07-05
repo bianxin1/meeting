@@ -11,10 +11,12 @@ public class NotificationVo {
     private Integer meetingId;
     private String message;
     private Date timestamp;
+    private Integer isRead;
     public NotificationVo(Notifications notification) {
         this.id = notification.getId();
         this.meetingId = notification.getMeetingId();
         this.message = notification.getMessage();
         this.timestamp = notification.getTimestamp();
+        this.isRead = notification.getIsRead();
     }
 }
