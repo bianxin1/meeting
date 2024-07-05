@@ -17,6 +17,7 @@ import com.meeting.utils.EmailTool;
 import com.meeting.utils.JwtTool;
 import com.meeting.utils.UserContext;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -35,6 +36,7 @@ import static com.meeting.commen.constants.RedisKey.USER_CODE_KEY;
 */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
     implements UsersService {
     private final StringRedisTemplate stringRedisTemplate;
@@ -85,8 +87,14 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
         //生成jwt
         String token = jwtTool.createToken(user.getId(), jwtProperties.getTokenTTL());
         LoginVo loginVo = new LoginVo();
-        BeanUtils.copyProperties(user, loginVo);
+        loginVo.setAccount(user.getName());
+        if (user.getRole()==1){
+            loginVo.setRole("admin");
+        }else {
+            loginVo.setRole("user");
+        }
         loginVo.setToken(token);
+        log.info("登录成功:token={}", token);
         return Result.succ(loginVo);
     }
 
