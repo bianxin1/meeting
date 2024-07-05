@@ -14,6 +14,7 @@ import com.meeting.domain.pojos.Rooms;
 
 import com.meeting.domain.pojos.Users;
 import com.meeting.domain.vos.MeetingDetailsVo;
+import com.meeting.domain.vos.MeetingsVo;
 import com.meeting.expection.CommonException;
 import com.meeting.expection.UnauthorizedException;
 import com.meeting.service.MeetingParticipantsService;
@@ -106,13 +107,31 @@ public class MeetingController {
     @ApiOperation("管理员会议分页查询")
     @RoleCheck(requiredRole = 1)
     @PostMapping("/search")
-    public Result  listMeetingByPage(@RequestBody MeetingQueryRequest meetingQueryRequest,
-                                            HttpServletRequest request) {
+    public Result listMeetingByPage(@RequestBody MeetingQueryRequest meetingQueryRequest,
+                                    HttpServletRequest request) {
         long current = meetingQueryRequest.getCurrent();
         long size = meetingQueryRequest.getPageSize();
-        Page<Meetings> meetingsPage = meetingsService.page(new Page<>(current, size),
-                meetingsService.getQueryWrapper(meetingQueryRequest));
-        return Result.succ(200, "查询成功", meetingsPage);
+        Page<Meetings> meetingsPage = new Page<>(current, size);
+
+        QueryWrapper<Meetings> queryWrapper = meetingsService.getQueryWrapper(meetingQueryRequest);
+        Page<Meetings> pageResult = meetingsService.page(meetingsPage, queryWrapper);
+
+        List<Meetings> meetingsList = pageResult.getRecords();
+        List<MeetingsVo> meetingsVos = new ArrayList<>();
+
+        for (Meetings meetings : meetingsList) {
+            MeetingsVo meetingsVo = new MeetingsVo();
+            Integer roomId = meetings.getRoomId(); // 获取会议室ID
+            String roomName = roomsService.getById(roomId).getName(); // 根据会议室ID获取会议室名称
+            BeanUtils.copyProperties(meetings, meetingsVo);
+            meetingsVo.setName(roomName); // 设置会议室名称
+            meetingsVos.add(meetingsVo);
+        }
+
+        Page<MeetingsVo> meetingsVoPage = new Page<>(current, size, pageResult.getTotal());
+        meetingsVoPage.setRecords(meetingsVos);
+
+        return Result.succ(200, "查询成功", meetingsVoPage);
     }
 
     @ApiOperation("查看会议的详细信息")
