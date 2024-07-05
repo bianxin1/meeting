@@ -124,7 +124,7 @@ public class MeetingController {
             Integer roomId = meetings.getRoomId(); // 获取会议室ID
             String roomName = roomsService.getById(roomId).getName(); // 根据会议室ID获取会议室名称
             BeanUtils.copyProperties(meetings, meetingsVo);
-            meetingsVo.setName(roomName); // 设置会议室名称
+            meetingsVo.setRoomName(roomName); // 设置会议室名称
             meetingsVos.add(meetingsVo);
         }
 
