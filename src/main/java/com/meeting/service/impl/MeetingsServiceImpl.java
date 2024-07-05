@@ -167,6 +167,7 @@ public class MeetingsServiceImpl extends ServiceImpl<MeetingsMapper, Meetings>
         queryWrapper.eq(id != null, "id", id);
         queryWrapper.eq(roomId!=null, "room_id", roomId);
         queryWrapper.eq(participantCount!=null, "participant_count", participantCount);
+        queryWrapper.eq(status!=null, "status", status);
         queryWrapper.ge(startTime!=null, "start_time", startTime);
         queryWrapper.le(endTime!=null, "end_time", endTime);
         queryWrapper.like(StringUtils.isNotBlank(name)&& !name.isEmpty(), "name", name);
