@@ -32,6 +32,7 @@ public class UserController {
     @ApiOperation("登录")
     @PostMapping("/login")
     public Result login(@RequestBody LoginDto loginDto) {
+        log.info("登录");
         // 登录
         return userService.login(loginDto);
     }
@@ -44,6 +45,7 @@ public class UserController {
     @ApiOperation("修改密码")
     @PutMapping("/updatePassword")
     public Result updatePassword(@RequestBody PasswordDto passwordDto) {
+        log.info("修改密码");
         // 修改密码
         return userService.updatePassword(passwordDto);
     }
