@@ -9,4 +9,5 @@ public class ScrollResult {
     private List<?> list;
     private Long minTime;
     private Integer offset;
+    private Integer total;
 }

@@ -28,7 +28,7 @@ public interface NotificationsService extends IService<Notifications> {
      * @param offset
      * @return
      */
-    ScrollResult scroll(Long max, Integer offset);
+    ScrollResult scroll(Long max, Integer offset,Integer size);
 
     /**
      * 标记通知为已读

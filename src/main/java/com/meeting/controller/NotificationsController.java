@@ -23,8 +23,9 @@ public class NotificationsController {
     private final NotificationsService notificationsService;
     @ApiOperation("获取通知列表")
     @GetMapping("/scroll")
-    public Result<ScrollResult> scroll(@RequestParam("lastId") Long max, @RequestParam(value = "offset", defaultValue = "0") Integer offset) {
-        return Result.succ(notificationsService.scroll(max, offset));
+    public Result<ScrollResult> scroll(@RequestParam("lastId") Long max, @RequestParam(value = "offset", defaultValue = "0") Integer offset,
+                                       @RequestParam("size") Integer size) {
+        return Result.succ(notificationsService.scroll(max, offset,size));
     }
     @ApiOperation("标记通知为已读")
     @GetMapping("/read")

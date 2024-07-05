@@ -62,12 +62,12 @@ public class NotificationsServiceImpl extends ServiceImpl<NotificationsMapper, N
      * @return
      */
     @Override
-    public ScrollResult scroll(Long max, Integer offset) {
+    public ScrollResult scroll(Long max, Integer offset, Integer size) {
         // 1.获取当前用户
         Long user = UserContext.getUser();
         String key = MEETING_NOTIFICATION_KET + user;
         // 2.查询当前用户的通知列表
-        Set<ZSetOperations.TypedTuple<String>> typedTuples = redisTemplate.opsForZSet().reverseRangeByScoreWithScores(key, 0, max, offset, 6);
+        Set<ZSetOperations.TypedTuple<String>> typedTuples = redisTemplate.opsForZSet().reverseRangeByScoreWithScores(key, 0, max, offset, size);
         // 2.1判断是否有通知
         if (typedTuples == null || typedTuples.isEmpty()) {
             return new ScrollResult();
@@ -106,6 +106,7 @@ public class NotificationsServiceImpl extends ServiceImpl<NotificationsMapper, N
         scrollResult.setOffset(os);
         scrollResult.setList(notificationVos);
         scrollResult.setMinTime(minTime);
+        scrollResult.setTotal(notificationVos.size());
         return scrollResult;
     }
 
