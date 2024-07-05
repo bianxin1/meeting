@@ -6,6 +6,8 @@ import com.meeting.commen.result.Result;
 import com.meeting.domain.dto.users.*;
 import com.meeting.domain.pojos.Users;
 
+import java.util.List;
+
 /**
 * @author shanmingxi
 * @description 针对表【users】的数据库操作Service
@@ -56,4 +58,5 @@ public interface UsersService extends IService<Users> {
      * 根据用户Id得到用户信息包括部门，邮箱，姓名，性别
      */
     Result getInfo(Long id);
+
 }

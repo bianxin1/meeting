@@ -1,18 +1,24 @@
 package com.meeting.controller;
 
+import cn.hutool.system.UserInfo;
 import com.meeting.commen.result.Result;
 
 import com.meeting.domain.dto.users.*;
+import com.meeting.domain.pojos.Users;
+import com.meeting.domain.vos.UserInfoVo;
 import com.meeting.service.UsersService;
 import com.meeting.utils.UserContext;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.List;
 
 @Api(tags = "用户管理")
 @RestController
@@ -67,5 +73,20 @@ public class UserController {
         Long Id = UserContext.getUser();
         return userService.getInfo(Id);
     }
+    @ApiOperation("未审批的用户")
+    @GetMapping ("/getUnapprovedUserInfo")
+    public Result getUnapprovedUserInfo() {
+        List<UserInfoVo> userInfoVoList =new ArrayList<>();
+        List<Users> list = userService.list();
+        for (Users user : list) {
+            if (user.getRole()==2){
+                UserInfoVo userInfoVo = new UserInfoVo();
+                BeanUtils.copyProperties(user,userInfoVo);
+                userInfoVoList.add(userInfoVo);
+            }
+        }
+        return Result.succ(userInfoVoList);
+    }
+
 
 }

@@ -26,6 +26,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpSession;
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
@@ -214,6 +215,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
         userInfoVo.setDepartment(department);
         return Result.succ(userInfoVo);
     }
+
 }
 
 
