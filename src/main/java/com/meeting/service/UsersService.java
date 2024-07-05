@@ -52,4 +52,8 @@ public interface UsersService extends IService<Users> {
      * @return
      */
     Result confirm(ConfirmDto confirmDto);
+    /**
+     * 根据用户Id得到用户信息包括部门，邮箱，姓名，性别
+     */
+    Result getInfo(Long id);
 }

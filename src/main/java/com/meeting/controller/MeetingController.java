@@ -86,7 +86,6 @@ public class MeetingController {
         // 把会议的参会人员暂存到redis中
         List<Long> usersIds = meetingsRequest.getUsersIds();
         String HuiYiHumanKey = MEETING_USERS_KEY + meetings.getId();
-
         cacheClient.set(HuiYiHumanKey, usersIds, 1L, TimeUnit.DAYS);
         return Result.succ(200, "预定成功", meetings);
     }

@@ -4,6 +4,7 @@ import com.meeting.commen.result.Result;
 
 import com.meeting.domain.dto.users.*;
 import com.meeting.service.UsersService;
+import com.meeting.utils.UserContext;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
@@ -61,6 +62,10 @@ public class UserController {
         // 审核通知
         return userService.confirm(confirmDto);
     }
-
+    @GetMapping ("/getUserInfo")
+    public Result getUserInfo() {
+        Long Id = UserContext.getUser();
+        return userService.getInfo(Id);
+    }
 
 }

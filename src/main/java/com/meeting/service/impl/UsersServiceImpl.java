@@ -11,6 +11,8 @@ import com.meeting.config.JwtProperties;
 import com.meeting.domain.dto.users.*;
 import com.meeting.domain.pojos.Users;
 import com.meeting.domain.vos.LoginVo;
+import com.meeting.domain.vos.UserInfoVo;
+import com.meeting.mapper.DepartmentsMapper;
 import com.meeting.mapper.UsersMapper;
 import com.meeting.service.UsersService;
 import com.meeting.utils.EmailTool;
@@ -46,7 +48,8 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
     private final EmailTool emailTool;
     @Autowired
     private HttpSession session;
-
+    @Autowired
+    private DepartmentsMapper   departmentsMapper;
     @Override
     public Result register(RegisterDto registerDto) {
         // 1. 校验验证码
@@ -201,6 +204,15 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
         String content = "您的账号已通过审核，可以正常使用系统.用户唯一id为："+u.getAccount();
         emailTool.sendEmail(u.getEmail(), content, title);
         return Result.succ("审核成功");
+    }
+    public Result getInfo(Long id){
+        Users user = usersMapper.selectById(id);
+        UserInfoVo userInfoVo = new UserInfoVo();
+        BeanUtils.copyProperties(user, userInfoVo);
+        Integer departmentId = user.getDepartmentId();
+        String department = departmentsMapper.selectById(departmentId).getName();
+        userInfoVo.setDepartment(department);
+        return Result.succ(userInfoVo);
     }
 }
 
