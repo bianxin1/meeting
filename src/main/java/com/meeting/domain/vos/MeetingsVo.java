@@ -25,7 +25,8 @@ public class MeetingsVo {
      *
      */
     private String roomName;
-
+    private Long userId;
+    private String userName;
     /**
      *
      */

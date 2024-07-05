@@ -44,6 +44,9 @@ public class RoomsServiceImpl extends ServiceImpl<RoomsMapper, Rooms>
             if (bookings == null) {
                 break;
             }
+            if(room.getStatus()==0){
+                unavailableRooms.add(room.getId());
+            }
             for (ZSetOperations.TypedTuple<String> booking : bookings) {
                 long bookedStart = Long.parseLong(Objects.requireNonNull(booking.getValue()));
                 long bookedEnd = Objects.requireNonNull(booking.getScore()).longValue();

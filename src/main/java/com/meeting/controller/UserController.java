@@ -4,6 +4,7 @@ import cn.hutool.system.UserInfo;
 import com.meeting.commen.result.Result;
 
 import com.meeting.domain.dto.users.*;
+import com.meeting.domain.pojos.Departments;
 import com.meeting.domain.pojos.Users;
 import com.meeting.domain.vos.UnUserInfo;
 import com.meeting.domain.vos.UserInfoVo;
@@ -88,6 +89,10 @@ public class UserController {
         }
         return Result.succ(UnUserInfoList);
     }
-
+    @GetMapping("/list")
+    public Result listAll() {
+        List<Users> list = userService.list();
+        return Result.succ(list);
+    }
 
 }

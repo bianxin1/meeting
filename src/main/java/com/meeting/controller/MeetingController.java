@@ -23,6 +23,7 @@ import com.meeting.service.MeetingsService;
 import com.meeting.service.RoomsService;
 import com.meeting.service.UsersService;
 import com.meeting.utils.CacheClient;
+import com.meeting.utils.UserContext;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -63,8 +64,8 @@ public class MeetingController {
 
     @ApiOperation("在指定时间段内查询可用的会议室")
     @PostMapping("/available")
-    public List<Rooms> getAvailableRooms(@RequestBody MeetingsTimeDTO meetingsTimeDTO) {
-        return roomsService.getAvailableRooms(meetingsTimeDTO.getStart_time(), meetingsTimeDTO.getEnd_time());
+    public Result getAvailableRooms(@RequestBody MeetingsTimeDTO meetingsTimeDTO) {
+        return Result.succ(roomsService.getAvailableRooms(meetingsTimeDTO.getStartTime(), meetingsTimeDTO.getEndTime()));
     }
 
     @ApiOperation("会议预订")
@@ -83,6 +84,7 @@ public class MeetingController {
         Meetings meetings = new Meetings();
         BeanUtils.copyProperties(meetingsRequest, meetings);
         meetings.setStatus(0);
+        meetings.setUserId(UserContext.getUser());
         boolean result = meetingsService.save(meetings);
         // 把会议的参会人员暂存到redis中
         List<Long> usersIds = meetingsRequest.getUsersIds();
@@ -124,7 +126,9 @@ public class MeetingController {
             Integer roomId = meetings.getRoomId(); // 获取会议室ID
             String roomName = roomsService.getById(roomId).getName(); // 根据会议室ID获取会议室名称
             BeanUtils.copyProperties(meetings, meetingsVo);
-            meetingsVo.setRoomName(roomName); // 设置会议室名称
+            String userName = usersService.getById(meetings.getUserId()).getName(); // 根据用户ID获取用户名称
+            meetingsVo.setUserName(userName); // 设置用户名称
+            meetingsVo.setRoomName(roomName); // 设置会议室名称9
             meetingsVos.add(meetingsVo);
         }
 

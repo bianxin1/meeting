@@ -6,10 +6,10 @@ import java.util.Date;
 @Data
 public class MeetingsTimeDTO {
 
-    private Date start_time;
+    private Date startTime;
 
     /**
      *
      */
-    private Date end_time;
+    private Date endTime;
 }

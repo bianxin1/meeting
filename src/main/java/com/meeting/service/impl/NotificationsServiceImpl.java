@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -46,7 +47,7 @@ public class NotificationsServiceImpl extends ServiceImpl<NotificationsMapper, N
         userIds.forEach(userId -> {
             Notifications notifications = new Notifications();
             notifications.setMeetingId(meetingId);
-            notifications.setUserId(userId.intValue());
+            notifications.setUserId(userId);
             notifications.setMessage("您有一个新的会议邀请：" + meetingName);
             notifications.setIsRead(0);
             this.save(notifications);
@@ -64,7 +65,7 @@ public class NotificationsServiceImpl extends ServiceImpl<NotificationsMapper, N
     public ScrollResult scroll(Long max, Integer offset) {
         // 1.获取当前用户
         Long user = UserContext.getUser();
-        String key = MEETING_NOTIFICATION_KET+ user;
+        String key = MEETING_NOTIFICATION_KET + user;
         // 2.查询当前用户的通知列表
         Set<ZSetOperations.TypedTuple<String>> typedTuples = redisTemplate.opsForZSet().reverseRangeByScoreWithScores(key, 0, max, offset, 10);
         // 2.1判断是否有通知
@@ -90,16 +91,24 @@ public class NotificationsServiceImpl extends ServiceImpl<NotificationsMapper, N
         os = minTime == max ? os : os + offset;
         // 5.查询通知
         List<Notifications> notifications = this.list(new QueryWrapper<Notifications>().in("id", ids));
-        // 6.返回结果
-        List<NotificationVo> notificationVos = notifications.stream()
-                .map(NotificationVo::new)
+
+        // 6.创建一个map，以通知id为键，通知对象为值
+        Map<Long, Notifications> notificationsMap = notifications.stream()
+                .collect(Collectors.toMap(Notifications::getId, notification -> notification));
+
+        // 7.按id顺序重新排序通知
+        List<NotificationVo> notificationVos = ids.stream()
+                .map(id -> new NotificationVo(notificationsMap.get(id)))
                 .collect(Collectors.toList());
+
+        // 8.返回结果
         ScrollResult scrollResult = new ScrollResult();
         scrollResult.setOffset(os);
         scrollResult.setList(notificationVos);
         scrollResult.setMinTime(minTime);
         return scrollResult;
     }
+
 
     /**
      * 标记通知为已读
@@ -111,6 +120,9 @@ public class NotificationsServiceImpl extends ServiceImpl<NotificationsMapper, N
     public MeetingDetailsVo read(Integer notificationId, Integer meetingId) {
         // 1.标记为已读
         Notifications notifications = this.getById(notificationId);
+        if (notifications.getIsRead() == 1) {
+            return meetingsService.searchMeetingDetails(meetingId);
+        }
         notifications.setIsRead(1);
         this.updateById(notifications);
         // 2.更新redis中的通知

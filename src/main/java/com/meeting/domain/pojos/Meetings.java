@@ -26,6 +26,7 @@ public class Meetings implements Serializable {
     /**
      * 
      */
+    private Long userId;
     private String name;
 
     /**

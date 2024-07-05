@@ -15,6 +15,7 @@ import com.meeting.domain.pojos.MeetingParticipants;
 import com.meeting.domain.pojos.Meetings;
 import com.meeting.domain.pojos.Users;
 import com.meeting.domain.vos.MeetingDetailsVo;
+import com.meeting.domain.vos.UserInfoVo;
 import com.meeting.mapper.MeetingsMapper;
 import com.meeting.mapper.RoomsMapper;
 import com.meeting.mapper.UsersMapper;
@@ -34,6 +35,7 @@ import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static com.meeting.commen.constants.RedisKey.*;
 
@@ -189,11 +191,17 @@ public class MeetingsServiceImpl extends ServiceImpl<MeetingsMapper, Meetings>
                 usersList.add(users);
             }
         }
+        //将userlist转换为userinfovo
+        List<UserInfoVo> userInfoVos = usersList.stream().map(users -> {
+            UserInfoVo userInfoVo = new UserInfoVo();
+            BeanUtils.copyProperties(users, userInfoVo);
+            return userInfoVo;
+        }).collect(Collectors.toList());
         MeetingDetailsVo meetingDetailsVo = new MeetingDetailsVo();
         BeanUtils.copyProperties(meetings, meetingDetailsVo);
         String roomName = roomMapper.selectById(meetingDetailsVo.getRoomId()).getName();
         meetingDetailsVo.setRoomName(roomName);;
-        meetingDetailsVo.setUsers(usersList);
+        meetingDetailsVo.setUsers(userInfoVos);
         return meetingDetailsVo;
     }
 

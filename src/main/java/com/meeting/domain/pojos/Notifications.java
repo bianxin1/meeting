@@ -20,12 +20,12 @@ public class Notifications implements Serializable {
      * 
      */
     @TableId(type = IdType.AUTO)
-    private Integer id;
+    private Long id;
 
     /**
      * 
      */
-    private Integer userId;
+    private Long userId;
 
     /**
      * 

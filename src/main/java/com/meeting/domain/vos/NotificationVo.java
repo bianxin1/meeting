@@ -7,7 +7,7 @@ import java.util.Date;
 
 @Data
 public class NotificationVo {
-    private Integer id;
+    private Long id;
     private Integer meetingId;
     private String message;
     private Date timestamp;

@@ -9,7 +9,7 @@ import java.util.List;
 
 @Data
 public class MeetingDetailsVo { private Integer id;
-
+    private Long userId;
     /**
      *
      */
@@ -42,5 +42,5 @@ public class MeetingDetailsVo { private Integer id;
      *
      */
     private Integer status;
-    private List<Users> users;
+    private List<UserInfoVo> users;
 }
