@@ -24,6 +24,7 @@ public class MeetingDetailsVo { private Integer id;
      *
      */
     private Integer roomId;
+    private String roomName;
 
     /**
      *

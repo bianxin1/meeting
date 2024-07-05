@@ -191,6 +191,8 @@ public class MeetingsServiceImpl extends ServiceImpl<MeetingsMapper, Meetings>
         }
         MeetingDetailsVo meetingDetailsVo = new MeetingDetailsVo();
         BeanUtils.copyProperties(meetings, meetingDetailsVo);
+        String roomName = roomMapper.selectById(meetingDetailsVo.getRoomId()).getName();
+        meetingDetailsVo.setRoomName(roomName);;
         meetingDetailsVo.setUsers(usersList);
         return meetingDetailsVo;
     }
