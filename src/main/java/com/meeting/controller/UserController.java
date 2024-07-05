@@ -5,6 +5,7 @@ import com.meeting.commen.result.Result;
 
 import com.meeting.domain.dto.users.*;
 import com.meeting.domain.pojos.Users;
+import com.meeting.domain.vos.UnUserInfo;
 import com.meeting.domain.vos.UserInfoVo;
 import com.meeting.service.UsersService;
 import com.meeting.utils.UserContext;
@@ -76,16 +77,16 @@ public class UserController {
     @ApiOperation("未审批的用户")
     @GetMapping ("/getUnapprovedUserInfo")
     public Result getUnapprovedUserInfo() {
-        List<UserInfoVo> userInfoVoList =new ArrayList<>();
+        List<UnUserInfo> UnUserInfoList =new ArrayList<>();
         List<Users> list = userService.list();
         for (Users user : list) {
             if (user.getRole()==2){
-                UserInfoVo userInfoVo = new UserInfoVo();
+                UnUserInfo userInfoVo = new UnUserInfo();
                 BeanUtils.copyProperties(user,userInfoVo);
-                userInfoVoList.add(userInfoVo);
+                UnUserInfoList.add(userInfoVo);
             }
         }
-        return Result.succ(userInfoVoList);
+        return Result.succ(UnUserInfoList);
     }
 
 

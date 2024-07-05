@@ -92,6 +92,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
         String token = jwtTool.createToken(user.getId(), jwtProperties.getTokenTTL());
         LoginVo loginVo = new LoginVo();
         loginVo.setAccount(user.getName());
+        loginVo.setId(user.getId());
         if (user.getRole()==1){
             loginVo.setRole("admin");
         }else {

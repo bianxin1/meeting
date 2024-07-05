@@ -154,6 +154,7 @@ public class MeetingsServiceImpl extends ServiceImpl<MeetingsMapper, Meetings>
 //        private Date endTime;
 //        private String description;
 //        private Integer status;
+
         Integer id = meetingQueryRequest.getId();
         String name = meetingQueryRequest.getName();
         Integer roomId = meetingQueryRequest.getRoomId();
@@ -166,9 +167,9 @@ public class MeetingsServiceImpl extends ServiceImpl<MeetingsMapper, Meetings>
         queryWrapper.eq(id != null, "id", id);
         queryWrapper.eq(roomId!=null, "room_id", roomId);
         queryWrapper.eq(participantCount!=null, "participant_count", participantCount);
-        queryWrapper.eq(startTime!=null, "start_time", startTime);
-        queryWrapper.eq(endTime!=null, "end_time", startTime);
-        queryWrapper.like(StringUtils.isNotBlank(name), "name", name);
+        queryWrapper.ge(startTime!=null, "start_time", startTime);
+        queryWrapper.le(endTime!=null, "end_time", endTime);
+        queryWrapper.like(StringUtils.isNotBlank(name)&& !name.isEmpty(), "name", name);
         queryWrapper.orderByAsc("id");
         return queryWrapper;
     }

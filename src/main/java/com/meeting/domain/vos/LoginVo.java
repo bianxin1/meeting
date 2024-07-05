@@ -7,4 +7,5 @@ public class LoginVo {
     String token;
     String role;
     String account;
+    Long id;
 }

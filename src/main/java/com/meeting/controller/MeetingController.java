@@ -106,13 +106,13 @@ public class MeetingController {
     @ApiOperation("管理员会议分页查询")
     @RoleCheck(requiredRole = 1)
     @PostMapping("/search")
-    public Page<Meetings> listMeetingByPage(@RequestBody MeetingQueryRequest meetingQueryRequest,
+    public Result  listMeetingByPage(@RequestBody MeetingQueryRequest meetingQueryRequest,
                                             HttpServletRequest request) {
         long current = meetingQueryRequest.getCurrent();
         long size = meetingQueryRequest.getPageSize();
         Page<Meetings> meetingsPage = meetingsService.page(new Page<>(current, size),
                 meetingsService.getQueryWrapper(meetingQueryRequest));
-        return meetingsPage;
+        return Result.succ(200, "查询成功", meetingsPage);
     }
 
     @ApiOperation("查看会议的详细信息")
